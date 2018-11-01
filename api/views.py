@@ -24,7 +24,7 @@ class Register(APIView):
         :return: Success/Error message
         """
         user = User()
-        user.email = request.query_params.get('email')
+        user.email = request.data.get('email')
         user.referral_code = referral_code_generator(6)
 
         try:
@@ -64,8 +64,8 @@ class Referral(APIView):
         :param request: referral code, referred_email
         :return: Success/Error message
         """
-        email = request.query_params.get('referred_email')
-        code = request.query_params.get('referral_code')
+        email = request.data.get('referred_email')
+        code = request.data.get('referral_code')
 
         email_validator = EmailValidator()
         try:
@@ -106,7 +106,7 @@ class Referral(APIView):
         except User.DoesNotExist:
             return Response({"message": "Invalid Referral Code"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request):
+    def delete(self, request, ref_code=None, ref_email=None):
         """
         Deletes referrals using given referral code and referred partner email if:
             referral is not converted
@@ -114,8 +114,8 @@ class Referral(APIView):
         :param request: referral code, referred_email
         :return: Success/Error message
         """
-        email = request.query_params.get('referred_email')
-        code = request.query_params.get('referral_code')
+        email = ref_email
+        code = ref_code
 
         email_validator = EmailValidator()
         try:
@@ -156,8 +156,8 @@ class Conversion(APIView):
         :param request: referral_code, referred_email
         :return: Success/Error message
         """
-        email = request.query_params.get('email')
-        code = request.query_params.get('referral_code')
+        email = request.data.get('email')
+        code = request.data.get('referral_code')
 
         try:
             user = User.objects.get(referral_code=code)
